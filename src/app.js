@@ -2,20 +2,12 @@ const express = require("express");
 
 const app = express();
 
+
+// ROUTING...
 // this will only handle get Calls to /user
-app.get("/user",(req,res)=>{
+app.get("/user/:userId",(req,res)=>{
+    console.log(req.params)
     res.send({fName : "Syed", lName : "Musharraf"})
-})
-
-// post
-app.post("/savedUser",(req, res)=>{
-    res.send("User Saved SuccessFully to the DataBase (MongoDB..)")
-    console.log(res.body)
-})
-
-// delete
-app.delete("/delete",(req, res)=>{
-    res.send("User Deleted Successfully...")
 })
 
 
