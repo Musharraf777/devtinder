@@ -7,7 +7,6 @@ const app = express();
 
 //use of next()
 
-
 // app.use("/user",(req, res, next)=>{
 //     console.log("fisrt Response")
 //     next();
@@ -29,52 +28,49 @@ const app = express();
 // }
 // )
 
-
 // Now Actual Concept of middleware start
 
-// middleware generally used with app.use - this is not compulsory but we used 
+// middleware generally used with app.use - this is not compulsory but we used
 
-app.use("/admin", adminAuth)
+app.use("/admin", adminAuth);
 // app.use("/user", userAuth)
 
-app.get("/user",userAuth, (req, res)=>{
-res.send("get all user data..")
-})  
+app.get("/user", userAuth, (req, res) => {
+  res.send("get all user data..");
+});
 
 // for the login api - (sent data back to the backed we dont need userAuth middleware there..)
-app.post("/post",(req, res)=>{
-    res.send("User data send successfully...")
-})
+app.post("/post", (req, res) => {
+  res.send("User data send successfully...");
+});
 app.get("/admin/getAllData", (req, res) => {
-    res.send('All data sented back to the Admin...')
-    // before the use of middleWare i need to configure below step for all API
-    // const token ='xyz'
-    // const isAdminAthoriaze = token === 'xyz';
-    // if(isAdminAthoriaze)
-    // {
-    //     res.send("Sent all data to admin..");
-    // }else{
-    //     res.status(401).send("Error occur")
-    // }
-})
+  res.send("All data sented back to the Admin...");
+  // before the use of middleWare i need to configure below step for all API
+  // const token ='xyz'
+  // const isAdminAthoriaze = token === 'xyz';
+  // if(isAdminAthoriaze)
+  // {
+  //     res.send("Sent all data to admin..");
+  // }else{
+  //     res.status(401).send("Error occur")
+  // }
+});
 
 app.get("/admin/delete", (req, res) => {
-    res.send("User deleted successfully from admin...")
-    // before the use of middleWare i need to configure below step for all API
-    // const token ='xyz'
-    // const isAdminAthoriaze = token === 'xyz';
-    // if(isAdminAthoriaze)
-    // {
-    //     res.send("user deleted Sucessfully..");
-    // }else{
-    //     res.status(401).send("Error occur")
-    // }
-})
-
+  res.send("User deleted successfully from admin...");
+  // before the use of middleWare i need to configure below step for all API
+  // const token ='xyz'
+  // const isAdminAthoriaze = token === 'xyz';
+  // if(isAdminAthoriaze)
+  // {
+  //     res.send("user deleted Sucessfully..");
+  // }else{
+  //     res.status(401).send("Error occur")
+  // }
+});
 
 app.listen(9999, () => {
-    console.log("Server is listening on port no.9999..");
-})
-
+  console.log("Server is listening on port no.9999..");
+});
 
 // so we need middleware to separate some sort of logic like user Authoration and then keep it to userAuth middlerware then use all Api that follow /user path....
