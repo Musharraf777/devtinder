@@ -2,25 +2,27 @@ const express = require("express");
 
 const app = express();
 
-
-// ROUTING...
-// this will only handle get Calls to /user
-app.get("/user/:userId",(req,res)=>{
-    console.log(req.params)
-    res.send({fName : "Syed", lName : "Musharraf"})
-})
-
-
-// this will match all api the HTTP method API call to /hello
-app.use("/hello",(req, res)=>{
-    res.send("My name is Hello kiujy")
-}) 
-app.use("/hello/mini",(req, res)=>{
-    res.send("My name is Khan")
-})
-
-
-
+// MIDDLEWARE
+app.use("/user",(req, res, next)=>{
+    console.log("fisrt Response")
+    next();
+},
+(req, res, next)=>{
+    // res.send("Second Response..")
+    next();
+},
+(req, res, next)=>{
+    // res.send("3rd Response..")
+    next()
+},
+(req, res, next)=>{
+    // res.send("4th Response..")
+    next()
+},
+(req, res, next)=>{
+    res.send("5th Response..")
+}
+)
 
 
 app.listen(9999,()=>{
