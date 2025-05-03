@@ -1,25 +1,30 @@
 const express = require("express");
-
+const connectDB = require("../src/config/database");
+const User = require("./models/userSchema");
 const app = express();
 
-// Remeber order matter a lot..
-// handling error alway write your code in try catch block
-app.get("/getAllData", (req, res)=>{
-    try{
-        throw new("child error")
-        res.send("User  data")
-    }catch(err){
-res.status(500).send(err.message)
-    }
+app.post("/signup", async (req, res) => {
+  // creating new instance of the userModel
+  const user = new User({
+    firstName: "Syed",
+    lastName: "Arshlan",
+    emailId: "Arshlan@gmail.com",
+    password: "Arshlan@786",
+  });
+  try{
+    await user.save();
+    res.send("user Added Successfully..")
+  }catch(err){console.log(err.message), res.status(400).send("Error while saving user...")}
 
-})
+});
 
-// and the here first para is err which is use to catch error 
-app.use("/",(err, req, res, next)=>{
-    if(err){
-        res.status(501).send("parent error");
-    }
-})
-app.listen(9999,()=>{
-    console.log("Server is listenting on 9999..")
-})
+connectDB()
+  .then(() => {
+    console.log("database connected successfully..");
+    app.listen(7777, () => {
+      console.log("server listed at 7777...");
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
