@@ -3,91 +3,99 @@ const connectDB = require("../src/config/database");
 const User = require("./models/userSchema");
 const bcrypt = require("bcrypt");
 
-const { validtateSignupData } = require("./utils/validation");
+
 const cookieParser = require("cookie-parser");
-const { userAuth } = require("./middleware/userAuth");
+
 const app = express();
 
 // Middleware used to read user data which have send from client
 app.use(cookieParser());
 app.use(express.json());
 
+const authRouter = require('./routes/auth');
+const profileRouter = require('./routes/profile');
+const connectionRouter = require('./routes/connection');
 
-// Signup
-app.post("/signup", async (req, res) => {
-  const { firstName, lastName, emailId, password } = req.body;
-  // validation of data
-  validtateSignupData(req);
-
-  // Encrypt the password
-  const passwordHash = await bcrypt.hash(password, 10);
-  const user = new User({
-    firstName,
-    lastName,
-    emailId,
-    password: passwordHash,
-  });
-  await user.save();
-  res.send("User Added Susscessfully..");
-});
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", connectionRouter);
 
 
-// Login
-app.post("/login", async (req, res) => {
-  try {
-    const { emailId, password } = req.body;
+// // Signup
+// app.post("/signup", async (req, res) => {
+//   const { firstName, lastName, emailId, password } = req.body;
+//   // validation of data
+//   validtateSignupData(req);
 
-    const user = await User.findOne({ emailId: emailId });
-    if (!user) {
-      throw new Error("invalid creaditial");
-    }
-    // bycrypt password
-    // const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    // 2nd way - mongoose schema methods...
-    const isPasswordValid = await user.validatePassword(password);
-
-    if (isPasswordValid) {
-
-      // create JWT Token
-      // const token = await jwt.sign({ _id: user._id }, "Dev@Tinder$8364", {expiresIn: "1d" });
-      // console.log(token);
-
-      // 2nd way - mongoose methods..
-      const token = await user.getJWT();
+//   // Encrypt the password
+//   const passwordHash = await bcrypt.hash(password, 10);
+//   const user = new User({
+//     firstName,
+//     lastName,
+//     emailId,
+//     password: passwordHash,
+//   });
+//   await user.save();
+//   res.send("User Added Susscessfully..");
+// });
 
 
-      //Add  the token to cokkie and send the response to to the user
-      res.cookie("token", token, {httpOnly : true}, {expires : new Date(Date.now()+ 8 *3600000)});
-      res.send("Login SuccessFully..");
-    } else {
-      throw new Error("invalid creaditial");
-    }
-  } catch (err) {
-    res.status(400).send("Error :", err.message);   
-  }
-});
+// // Login
+// app.post("/login", async (req, res) => {
+//   try {
+//     const { emailId, password } = req.body;
+
+//     const user = await User.findOne({ emailId: emailId });
+//     if (!user) {
+//       throw new Error("invalid creaditial");
+//     }
+//     // bycrypt password
+//     // const isPasswordValid = await bcrypt.compare(password, user.password);
+
+//     // 2nd way - mongoose schema methods...
+//     const isPasswordValid = await user.validatePassword(password);
+
+//     if (isPasswordValid) {
+
+//       // create JWT Token
+//       // const token = await jwt.sign({ _id: user._id }, "Dev@Tinder$8364", {expiresIn: "1d" });
+//       // console.log(token);
+
+//       // 2nd way - mongoose methods..
+//       const token = await user.getJWT();
 
 
-// Profile
-app.get("/profile", userAuth, (req, res) => {
-  try {
-    const user = req.user;
-    if (!user) {
-      throw new Error("User not exist..");
-    }
-    res.send(user);
-  } catch (err) {
-    res.status(404).send("Error :", err.message);
-  }
-});
+//       //Add  the token to cokkie and send the response to to the user
+//       res.cookie("token", token, {httpOnly : true}, {expires : new Date(Date.now()+ 8 *3600000)});
+//       res.send("Login SuccessFully..");
+//     } else {
+//       throw new Error("invalid creaditial");
+//     }
+//   } catch (err) {
+//     res.status(400).send("Error :", err.message);   
+//   }
+// });
 
 
-// Test API
-app.post("/sendConnectionRequest", userAuth, (req, res)=>{
-  console.log(req.user , "Make Connection Requset...");
-  res.send("Connection Made Successfully..")
-})
+// // Profile
+// app.get("/profile", userAuth, (req, res) => {
+//   try {
+//     const user = req.user;
+//     if (!user) {
+//       throw new Error("User not exist..");
+//     }
+//     res.send(user);
+//   } catch (err) {
+//     res.status(404).send("Error :", err.message);
+//   }
+// });
+
+
+// // Test API
+// app.post("/sendConnectionRequest", userAuth, (req, res)=>{
+//   console.log(req.user , "Make Connection Requset...");
+//   res.send("Connection Made Successfully..")
+// })
 
 // send data to database
 // app.post("/signup", async (req, res) => {

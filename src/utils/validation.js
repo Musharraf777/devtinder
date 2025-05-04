@@ -14,6 +14,13 @@
     
  }
 
+ const validateEditProfileData =(req)=>{
+    const allowedEditFileds  =["firstName", "lastName", "emailId"]
+   const isAllowed=  Object.keys(req.body).every(filed=>allowedEditFileds.includes(filed))
+   return isAllowed
+ }
+
  module.exports ={
-    validtateSignupData
+    validtateSignupData,
+    validateEditProfileData
  }
