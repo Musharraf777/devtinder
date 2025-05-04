@@ -2,7 +2,7 @@ const express = require("express");
 const connectDB = require("../src/config/database");
 const User = require("./models/userSchema");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+
 const { validtateSignupData } = require("./utils/validation");
 const cookieParser = require("cookie-parser");
 const { userAuth } = require("./middleware/userAuth");
@@ -41,12 +41,20 @@ app.post("/login", async (req, res) => {
     if (!user) {
       throw new Error("invalid creaditial");
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // bycrypt password
+    // const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    // 2nd way - mongoose schema methods...
+    const isPasswordValid = await user.validatePassword(password);
+
     if (isPasswordValid) {
 
       // create JWT Token
-      const token = await jwt.sign({ _id: user._id }, "Dev@Tinder$8364", {expiresIn: "1d" });
-      console.log(token);
+      // const token = await jwt.sign({ _id: user._id }, "Dev@Tinder$8364", {expiresIn: "1d" });
+      // console.log(token);
+
+      // 2nd way - mongoose methods..
+      const token = await user.getJWT();
 
 
       //Add  the token to cokkie and send the response to to the user
