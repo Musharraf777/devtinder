@@ -1,16 +1,21 @@
 const express = require("express");
 const connectDB = require("../src/config/database");
 const User = require("./models/userSchema");
-const bcrypt = require('bcrypt');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const { validtateSignupData } = require("./utils/validation");
+const cookieParser = require("cookie-parser");
+const { userAuth } = require("./middleware/userAuth");
 const app = express();
 
 // Middleware used to read user data which have send from client
-app.use(express.json())
+app.use(cookieParser());
+app.use(express.json());
 
-// Signup 
-app.post("/signup", async(req, res)=>{
-  const {firstName, lastName, emailId, password} = req.body;
+
+// Signup
+app.post("/signup", async (req, res) => {
+  const { firstName, lastName, emailId, password } = req.body;
   // validation of data
   validtateSignupData(req);
 
@@ -20,33 +25,62 @@ app.post("/signup", async(req, res)=>{
     firstName,
     lastName,
     emailId,
-    password : passwordHash
-  })
+    password: passwordHash,
+  });
   await user.save();
-  res.send("User Added Susscessfully..")
-})
+  res.send("User Added Susscessfully..");
+});
+
 
 // Login
-app.post("/login", async(req, res)=>{
-  try{
-    const {emailId, password} = req.body
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
 
-    const user  = await User.findOne({emailId : emailId});
-    if(!user){
-      throw new Error("invalid creaditial")
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("invalid creaditial");
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password)
-    if(isPasswordValid){
-      res.send("Login SuccessFully..")
-    } else{
-      throw new Error("invalid creaditial")
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (isPasswordValid) {
+
+      // create JWT Token
+      const token = await jwt.sign({ _id: user._id }, "Dev@Tinder$8364", {expiresIn: "1d" });
+      console.log(token);
+
+
+      //Add  the token to cokkie and send the response to to the user
+      res.cookie("token", token, {httpOnly : true}, {expires : new Date(Date.now()+ 8 *3600000)});
+      res.send("Login SuccessFully..");
+    } else {
+      throw new Error("invalid creaditial");
     }
-  }catch(err){
-res.status(400).send("Error : ", err.)
+  } catch (err) {
+    res.status(400).send("Error :", err.message);   
   }
-  
+});
 
+
+// Profile
+app.get("/profile", userAuth, (req, res) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      throw new Error("User not exist..");
+    }
+    res.send(user);
+  } catch (err) {
+    res.status(404).send("Error :", err.message);
+  }
+});
+
+
+// Test API
+app.post("/sendConnectionRequest", userAuth, (req, res)=>{
+  console.log(req.user , "Make Connection Requset...");
+  res.send("Connection Made Successfully..")
 })
+
 // send data to database
 // app.post("/signup", async (req, res) => {
 //   //creating new instance of the userModel
@@ -57,11 +91,11 @@ res.status(400).send("Error : ", err.)
 //   }catch(err){console.log(err.message), res.status(400).send("Error while saving user...")}
 //  });
 
- // Get user by email
+// Get user by email
 //  app.get("/user", async (req, res)=>{
 //     const userEmail = req.body.emailId
 //     try{
-//       // if there are same two email find one from 
+//       // if there are same two email find one from
 //       const user = await User.findOne({emailId : userEmail});
 //       if(!user){
 //         res.status(400).send("user not found..");
@@ -82,7 +116,7 @@ res.status(400).send("Error : ", err.)
 //     }
 //  })
 
- // Find all user from DB..
+// Find all user from DB..
 //  app.get("/feed",async(req,res)=>{
 // try{
 //   const users = await User.find({});
@@ -101,7 +135,7 @@ res.status(400).send("Error : ", err.)
 //   }catch(err){}
 //  })
 
- // Updtae the user data..
+// Updtae the user data..
 //  app.patch("/user", async(req, res)=>{
 //   const userId = req.body.userId;
 //   const data = req.body;
