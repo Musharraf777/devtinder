@@ -6,8 +6,8 @@
 
   # profileRouter
 - GET /profile/view
-- Patch /profile/edit  [update - gender, age, DOB]
-- Patch /profile/forgot/password
+- Patch /profile/edit ==> [update - gender, age, DOB]
+- Patch /profile/forgot/password ==>[Homework forgot password...]
 
   # connectionRequestRouter
 - Post /request/send/interested/:userId
