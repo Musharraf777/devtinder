@@ -4,6 +4,7 @@ const connectionRequestSchema = new mongoose.Schema(
   {
     fromUserId: {
       type: mongoose.Schema.Types.ObjectId,
+      ref : "User",
       required : true
     },
     toUserId: {
@@ -22,7 +23,7 @@ const connectionRequestSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// create compound index for better Find oof value
+// create compound index for boost DB Performance..
 connectionRequestSchema.index({fromUserId : 1, toUserId:1})
 
 // check if sent connection to yourself..

@@ -12,6 +12,7 @@
   # connectionRequestRouter
 - Post /request/send/interested/:userId
 - Post /request/send/ignore/:userId
+
 - Post /request/review/accepted/:requestId
 - Post /request/review/rejected/:requestId
 
